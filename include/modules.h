@@ -19,6 +19,8 @@ public:
     vector<float> forward(const vector<float> &input) override;
     vector<float> backward(const vector<float> &grad_output) override;
     void update(float lr) override;
+
+    // Expose weights and biases for comparison
     vector<vector<float>> weights;
     vector<float> bias;
     vector<vector<float>> grad_weights;
@@ -28,6 +30,7 @@ private:
     int input_size;
     int output_size;
 
+    // Store input for backward pass
     vector<float> input;
 };
 

@@ -11,7 +11,7 @@ public:
     std::vector<float> backward(const std::vector<float> &grad_output) override;
     void update(float lr) override;
 private:
-    std::vector<bool> zeroed;
+    std::vector<bool> zeroed; // Store for backpropagation
 };
 
 #endif
