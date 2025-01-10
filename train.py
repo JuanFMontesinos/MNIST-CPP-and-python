@@ -98,6 +98,6 @@ for i in pbar:
         wrong += 1
     acc = good / (good + wrong)
     if i % 1000 == 0:
-        img = test_images[i].view(28, 28)
+        img = test_images[i].reshape(28, 28)
         plt.imsave(f'results/img_{i}_{int(pred)}.png', img)
     pbar.set_description(f'Loss: {(avg/(i+1)):.4f} | Acc: {acc:.4f}')
