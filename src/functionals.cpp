@@ -1,7 +1,15 @@
 #include <vector>
 #include "functionals.h"
+#include <unordered_map>
 
 using namespace std;
+
+static const std::unordered_map<DType, size_t> DTypeSizeMap = {
+    {DType::INT, sizeof(int)},
+    {DType::FLOAT, sizeof(float)},
+    {DType::DOUBLE, sizeof(double)},
+    {DType::CHAR, sizeof(char)}};
+    
 vector<float> functionals::softmax(const vector<float> &input)
 {
     vector<float> output(input.size());
@@ -30,4 +38,16 @@ vector<float> functionals::flatten2d(const vector<vector<float>> &input)
         }
     }
     return output;
+}
+
+size_t functionals::TensorSize(const vector<int> &shape, DType dtype)
+{
+    size_t tensor_size = 1;
+    for (int i = 0; i < shape.size(); i++)
+    {
+        tensor_size *= shape[i];
+    }
+    auto dtype_size = DTypeSizeMap.find(dtype)->second;
+
+    return tensor_size * dtype_size;
 }
