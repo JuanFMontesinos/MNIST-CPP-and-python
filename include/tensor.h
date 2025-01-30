@@ -4,6 +4,7 @@
 #include <vector>
 #include <string>
 #include <enums.h>
+#include <cuda_runtime.h>
 
 #define CUDA_CHECK(call)                                                         \
     do                                                                           \
@@ -15,8 +16,6 @@
             exit(err);                                                           \
         }                                                                        \
     } while (0)
-
-
 
 // Tensor class
 class Tensor
@@ -33,7 +32,42 @@ public:
     Tensor(const std::vector<int> &shape, DType dtype, DeviceType device, void *address);
     static Tensor empty(const std::vector<int> &shape, DType dtype, DeviceType device);
     static Tensor zeros(const std::vector<int> &shape, DType dtype, DeviceType device);
+    // 1) Delete copy constructor & copy assignment
+    Tensor(const Tensor &) = delete;
+    Tensor &operator=(const Tensor &) = delete;
 
+    // move constructor
+    Tensor(Tensor &&other) noexcept
+    {
+        this->A = other.A;
+        this->shape = std::move(other.shape);
+        this->dtype = other.dtype;
+        this->device = other.device;
+        other.A = nullptr;
+    }
+
+    // move assignment operator
+    Tensor &operator=(Tensor &&other) noexcept
+    {
+        if (this != &other)
+        {
+            // First free our own memory
+            if (A)
+            {
+                if (device == DeviceType::GPU)
+                    cudaFree(A);
+                else
+                    free(A);
+            }
+            // Transfer ownership from 'other'
+            A = other.A;
+            shape = std::move(other.shape);
+            dtype = other.dtype;
+            device = other.device;
+            other.A = nullptr;
+        }
+        return *this;
+    }
     // Destructor
     ~Tensor();
 
@@ -48,7 +82,6 @@ public:
     void Cpu();
     bool isCuda() const;
     bool isCpu() const;
-
 };
 
 #endif // TENSOR_H
